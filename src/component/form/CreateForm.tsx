@@ -25,6 +25,7 @@ const CreateForm: React.FC = () => {
     const [errors, setErrors] = useState([])
 
     const onFinish = (values: any) => {
+        setErrors([])
         let result = createEmployee(values["user"]);
         result.then(result => {
             if (result.errors) {
