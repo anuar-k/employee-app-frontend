@@ -1,6 +1,6 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {Button, Form, Input, Select, TreeSelect} from 'antd';
-import {createEmployee, getAllCountries, getAllEmployee, getCitiesByCountryName} from "../api/api";
+import {Alert, Button, Form, Input, Select, Space} from 'antd';
+import {createEmployee, getAllCountries, getCitiesByCountryName} from "../api/api";
 import {CityType, CountryType} from "../interfaces/interface";
 
 const layout = {
@@ -9,13 +9,9 @@ const layout = {
 };
 
 const validateMessages = {
-    required: '${label} is required!',
+    required: 'заполните ${label}',
     types: {
-        email: '${label} is not a valid email!',
-        number: '${label} is not a valid number!',
-    },
-    number: {
-        range: '${label} must be between ${min} and ${max}',
+        email: 'заполните ${label}'
     },
 };
 
@@ -26,10 +22,17 @@ const CreateForm: React.FC = () => {
     const [cities, setCities] = useState<CityType[]>([]);
     const [selectedCountry, setSelectedCountry] = useState("dada")
     const [selectedCity, setSelectedCity] = useState("")
-    const selectRef = useRef('')
+    const [errors, setErrors] = useState([])
+
     const onFinish = (values: any) => {
-        createEmployee(values["user"])
-        form.resetFields();
+        let result = createEmployee(values["user"]);
+        result.then(result => {
+            if (result.errors) {
+                setErrors(result.errors)
+            } else {
+                form.resetFields();
+            }
+        })
     };
 
     useEffect(() => {
@@ -87,22 +90,21 @@ const CreateForm: React.FC = () => {
             <Form.Item name={['user', 'email']} label="Email"
                        rules={[{type: "email"},
                            {
-                               required: true,
-                               message: "Enter you email"
+                               required: true
                            }]}>
                 <Input/>
             </Form.Item>
             <Form.Item name={['user', 'number']} label="Телефон"
                        rules={[
                            {
-                               type: "regexp",
-                               pattern: new RegExp("/^[\\\\+]?[(]?[0-9]{3}[)]?[-\\\\s\\\\.]?[0-9]{3}[-\\\\s\\\\.]?[0-9]{4,6}$/im"),
-                               message: "Format is wrong"
+                               required: true,
+                               message: "заполните номер"
                            },
                            {
-                               required: true,
-                               message: "Enter you number"
-                           }
+                               type: "regexp",
+                               pattern: new RegExp("/^[\\\\+]?[(]?[0-9]{3}[)]?[-\\\\s\\\\.]?[0-9]{3}[-\\\\s\\\\.]?[0-9]{4,6}$/im"),
+                               message: "заполните номер правильно"
+                           },
                        ]}
             >
                 <Input/>
@@ -112,6 +114,13 @@ const CreateForm: React.FC = () => {
                     Добавить
                 </Button>
             </Form.Item>
+
+            {errors && errors.map(error =>
+                <Space direction="vertical" style={{ width: '100%' }}>
+                    <Alert message={'Валидация на стороне backend: ' + error} type="error" showIcon />
+                </Space>
+
+            )}
         </Form>
     );
 }

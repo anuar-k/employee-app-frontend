@@ -32,14 +32,16 @@ export const createEmployee = (data: any) => {
         body: JSON.stringify(data)
     };
 
-    fetch(BACKEND_URL + CREATE_EMPLOYEE_URI, options)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        })
-        .catch(error => {
-            console.error('There was an error!', error);
-        });
+    return fetch(BACKEND_URL + CREATE_EMPLOYEE_URI, options)
+        .then(response => response.json())
+    // {
+    // if (!response.ok) {
+    // throw new Error('Network response was not ok');
+    // return response.json()
+    // }
+    // return response.json();
+    // })
+    // .catch(error => {
+    //     console.error('There was an error!', error);
+    // });
 }
